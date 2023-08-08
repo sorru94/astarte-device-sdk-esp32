@@ -28,6 +28,7 @@
 #include "astarte_bson_types.h"
 #include "astarte_credentials.h"
 #include "astarte_device.h"
+#include "astarte_hwid.h"
 #include "astarte_interface.h"
 
 /************************************************
@@ -83,6 +84,35 @@ static void astarte_disconnection_events_handler(astarte_device_disconnection_ev
  * Global functions definition
  ***********************************************/
 
+/**
+ * @brief Test function for HWID generation.
+ * @details This function calls astarte_hwid_get_id and subsequently astarte_hwid_encode.
+ * Pretty prints the generated HWID both encoded and not encoded and functions result.
+ *
+ * @note Remember to correctly configure the SDK options CONFIG_ASTARTE_HWID_ENABLE_UUID and
+ * CONFIG_ASTARTE_HWID_UUID_NAMESPACE.
+ */
+static void hwid_test(void)
+{
+    // Generate HWID
+    uint8_t generated_hwid[16U] = { 0 };
+    astarte_err_t err = astarte_hwid_get_id(generated_hwid);
+    // Print result of HWID generation
+    ESP_LOGW(TAG, "Return value astarte_hwid_get_id: %d.", err);
+    ESP_LOGW(TAG,
+        "HWID before encoding: [%u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u]",
+        generated_hwid[0], generated_hwid[1], generated_hwid[2], generated_hwid[3],
+        generated_hwid[4], generated_hwid[5], generated_hwid[6], generated_hwid[7],
+        generated_hwid[8], generated_hwid[9], generated_hwid[10], generated_hwid[11],
+        generated_hwid[12], generated_hwid[13], generated_hwid[14], generated_hwid[15]);
+    // Encode HWID
+    char encoded_hwid[100U];
+    err = astarte_hwid_encode(encoded_hwid, sizeof(encoded_hwid), generated_hwid);
+    // Print result of HWID encoding
+    ESP_LOGW(TAG, "Return value of astarte_hwid_encode: %d.", err);
+    ESP_LOGW(TAG, "Encoded HWID: '%s'", encoded_hwid);
+}
+
 void astarte_example_task(void *ctx)
 {
     (void) ctx;
@@ -91,11 +121,10 @@ void astarte_example_task(void *ctx)
         ESP_LOGE(TAG, "Failed to initialize credentials");
         return;
     }
-    /*
-     * For additional ways to define the hwid of your device, see the documentation for
-     * the astarte_device_init function in astarte_device.h
-     *
-     */
+
+    hwid_test();
+    hwid_test();
+
     astarte_device_config_t cfg = {
         .data_event_callback = astarte_data_events_handler,
         .connection_event_callback = astarte_connection_events_handler,
