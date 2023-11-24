@@ -34,6 +34,7 @@ idf_component_register(
         "./src/astarte_nvs_key_value.c"
         "./src/astarte_zlib.c"
         "./src/uuid.c"
+        "./src/zlib_tests.c"
     INCLUDE_DIRS "include"
     PRIV_INCLUDE_DIRS "private"
     PRIV_REQUIRES vfs mbedtls fatfs mqtt nvs_flash esp_http_client json wpa_supplicant)

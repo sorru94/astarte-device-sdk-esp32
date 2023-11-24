@@ -32,6 +32,7 @@
 #include "astarte_credentials.h"
 #include "astarte_device.h"
 #include "astarte_interface.h"
+#include "zlib_tests.h"
 
 /************************************************
  * Constants and defines
@@ -39,75 +40,68 @@
 
 #define TAG "ASTARTE_EXAMPLE_DATASTREAMS"
 
-// #define SET_PROPERTY
-// #define SET_PROPERTY_TWICE
-// #define REPLY_TO_PROPERTY
-// #define REPLY_TO_PROPERTY2
+// // #define SET_PROPERTY
+// // #define REPLY_TO_PROPERTY
+// // #define REPLY_TO_PROPERTY2
 
-static const char cred_sec[] = CONFIG_CREDENTIALS_SECRET;
-static const char hwid[] = CONFIG_DEVICE_ID;
-static const char realm[] = CONFIG_ASTARTE_REALM;
+// static const char cred_sec[] = CONFIG_CREDENTIALS_SECRET;
+// static const char hwid[] = CONFIG_DEVICE_ID;
+// static const char realm[] = CONFIG_ASTARTE_REALM;
 
-const static astarte_interface_t device_properties_interface1 = {
-    .name = "org.astarteplatform.esp32.examples.DeviceProperties1",
-    .major_version = 0,
-    .minor_version = 1,
-    .ownership = OWNERSHIP_DEVICE,
-    .type = TYPE_PROPERTIES,
-};
+// const static astarte_interface_t device_properties_interface1 = {
+//     .name = "org.astarteplatform.esp32.examples.DeviceProperties1",
+//     .major_version = 0,
+//     .minor_version = 1,
+//     .ownership = OWNERSHIP_DEVICE,
+//     .type = TYPE_PROPERTIES,
+// };
 
-const static astarte_interface_t device_properties_interface2 = {
-    .name = "org.astarteplatform.esp32.examples.DeviceProperties2",
-    .major_version = 0,
-    .minor_version = 1,
-    .ownership = OWNERSHIP_DEVICE,
-    .type = TYPE_PROPERTIES,
-};
+// const static astarte_interface_t device_properties_interface2 = {
+//     .name = "org.astarteplatform.esp32.examples.DeviceProperties2",
+//     .major_version = 0,
+//     .minor_version = 1,
+//     .ownership = OWNERSHIP_DEVICE,
+//     .type = TYPE_PROPERTIES,
+// };
 
-const static astarte_interface_t server_properties_interface1 = {
-    .name = "org.astarteplatform.esp32.examples.ServerProperties1",
-    .major_version = 0,
-    .minor_version = 1,
-    .ownership = OWNERSHIP_SERVER,
-    .type = TYPE_PROPERTIES,
-};
+// const static astarte_interface_t server_properties_interface1 = {
+//     .name = "org.astarteplatform.esp32.examples.ServerProperties1",
+//     .major_version = 0,
+//     .minor_version = 1,
+//     .ownership = OWNERSHIP_SERVER,
+//     .type = TYPE_PROPERTIES,
+// };
 
-const static astarte_interface_t server_properties_interface2 = {
-    .name = "org.astarteplatform.esp32.examples.ServerProperties2",
-    .major_version = 0,
-    .minor_version = 1,
-    .ownership = OWNERSHIP_SERVER,
-    .type = TYPE_PROPERTIES,
-};
+// const static astarte_interface_t server_properties_interface2 = {
+//     .name = "org.astarteplatform.esp32.examples.ServerProperties2",
+//     .major_version = 0,
+//     .minor_version = 1,
+//     .ownership = OWNERSHIP_SERVER,
+//     .type = TYPE_PROPERTIES,
+// };
 
 /************************************************
  * Static functions declaration
  ***********************************************/
 
-/**
- * @brief Handler for astarte connection events.
- *
- * @param event Astarte device connection event pointer.
- */
-static void astarte_connection_events_handler(astarte_device_connection_event_t *event);
-/**
- * @brief Handler for astarte data event.
- *
- * @param event Astarte device data event pointer.
- */
-static void astarte_data_events_handler(astarte_device_data_event_t *event);
-/**
- * @brief Handler for astarte unset event.
- *
- * @param event Astarte device unset event pointer.
- */
-static void astarte_unset_events_handler(astarte_device_unset_event_t *event);
-/**
- * @brief Handler for astarte disconnection events.
- *
- * @param event Astarte device disconnection event pointer.
- */
-static void astarte_disconnection_events_handler(astarte_device_disconnection_event_t *event);
+// /**
+//  * @brief Handler for astarte connection events.
+//  *
+//  * @param event Astarte device connection event pointer.
+//  */
+// static void astarte_connection_events_handler(astarte_device_connection_event_t *event);
+// /**
+//  * @brief Handler for astarte data event.
+//  *
+//  * @param event Astarte device data event pointer.
+//  */
+// static void astarte_data_events_handler(astarte_device_data_event_t *event);
+// /**
+//  * @brief Handler for astarte disconnection events.
+//  *
+//  * @param event Astarte device disconnection event pointer.
+//  */
+// static void astarte_disconnection_events_handler(astarte_device_disconnection_event_t *event);
 
 /************************************************
  * Global functions definition
@@ -117,76 +111,53 @@ void astarte_example_task(void *ctx)
 {
     (void) ctx;
 
-    if (astarte_credentials_init() != ASTARTE_OK) {
-        ESP_LOGE(TAG, "Failed to initialize credentials");
-        return;
-    }
+    zlib_compression_test();
+    zlib_decompression_test();
 
-    bool invert_reply = true;
-    astarte_device_config_t cfg = {
-        .data_event_callback = astarte_data_events_handler,
-        .unset_event_callback = astarte_unset_events_handler,
-        .connection_event_callback = astarte_connection_events_handler,
-        .disconnection_event_callback = astarte_disconnection_events_handler,
-        .callbacks_user_data = (void *) &invert_reply,
-        .credentials_secret = cred_sec,
-        .hwid = hwid,
-        .realm = realm,
-    };
+//     if (astarte_credentials_init() != ASTARTE_OK) {
+//         ESP_LOGE(TAG, "Failed to initialize credentials");
+//         return;
+//     }
 
-    astarte_device_handle_t device = astarte_device_init(&cfg);
-    if (!device) {
-        ESP_LOGE(TAG, "Failed to init astarte device");
-        return;
-    }
+//     bool invert_reply = true;
+//     astarte_device_config_t cfg = {
+//         .data_event_callback = astarte_data_events_handler,
+//         .connection_event_callback = astarte_connection_events_handler,
+//         .disconnection_event_callback = astarte_disconnection_events_handler,
+//         .callbacks_user_data = (void *) &invert_reply,
+//         .credentials_secret = cred_sec,
+//         .hwid = hwid,
+//         .realm = realm,
+//     };
 
-    astarte_device_add_interface(device, &device_properties_interface1);
-    astarte_device_add_interface(device, &device_properties_interface2);
-    astarte_device_add_interface(device, &server_properties_interface1);
-    astarte_device_add_interface(device, &server_properties_interface2);
-    if (astarte_device_start(device) != ASTARTE_OK) {
-        ESP_LOGE(TAG, "Failed to start astarte device");
-        return;
-    }
+//     astarte_device_handle_t device = astarte_device_init(&cfg);
+//     if (!device) {
+//         ESP_LOGE(TAG, "Failed to init astarte device");
+//         return;
+//     }
 
-    ESP_LOGI(TAG, "Encoded device ID: %s", astarte_device_get_encoded_id(device));
+//     astarte_device_add_interface(device, &device_properties_interface1);
+//     astarte_device_add_interface(device, &device_properties_interface2);
+//     astarte_device_add_interface(device, &server_properties_interface1);
+//     astarte_device_add_interface(device, &server_properties_interface2);
+//     if (astarte_device_start(device) != ASTARTE_OK) {
+//         ESP_LOGE(TAG, "Failed to start astarte device");
+//         return;
+//     }
 
-#if defined(SET_PROPERTY)
-    const TickType_t five_s_ticks = 5000 / portTICK_PERIOD_MS;
-    vTaskDelay(five_s_ticks);
+//     ESP_LOGI(TAG, "Encoded device ID: %s", astarte_device_get_encoded_id(device));
 
-    // Set some properties to a standard value
-    astarte_err_t astarte_err = astarte_device_set_boolean_property(
-        device, device_properties_interface1.name, "/sensor1/boolean_endpoint", true);
-    ESP_LOGI(TAG, "Transmission result: %d", astarte_err);
-    astarte_err = astarte_device_set_boolean_property(
-        device, device_properties_interface1.name, "/sensor2/boolean_endpoint", true);
-    ESP_LOGI(TAG, "Transmission result: %d", astarte_err);
-    astarte_err = astarte_device_set_boolean_property(
-        device, device_properties_interface1.name, "/sensor3/boolean_endpoint", true);
-    ESP_LOGI(TAG, "Transmission result: %d", astarte_err);
-    astarte_err = astarte_device_set_boolean_property(
-        device, device_properties_interface2.name, "/sensor4/boolean_endpoint", true);
-    ESP_LOGI(TAG, "Transmission result: %d", astarte_err);
-#endif
+// #if defined(SET_PROPERTY)
+//     vTaskDelay( 5000 / portTICK_PERIOD_MS );
 
-#if defined(SET_PROPERTY_TWICE)
-    const TickType_t five_s_ticks = 5000 / portTICK_PERIOD_MS;
-    vTaskDelay(five_s_ticks);
+//     // Set a property to a standard value
+//     astarte_err_t astarte_err = astarte_device_set_boolean_property(device,
+//         device_properties_interface1.name, "/11/boolean_endpoint", true);
+//     ESP_LOGI(TAG, "Transmission result: %d", astarte_err);
+// #endif
 
-    // Set some properties to a standard value
-    astarte_err_t astarte_err = astarte_device_set_boolean_property(
-        device, device_properties_interface1.name, "/sensor1/boolean_endpoint", true);
-    ESP_LOGI(TAG, "Transmission result: %d", astarte_err);
-    vTaskDelay(five_s_ticks);
-    astarte_err = astarte_device_set_boolean_property(
-        device, device_properties_interface1.name, "/sensor1/boolean_endpoint", true);
-    ESP_LOGI(TAG, "Transmission result: %d", astarte_err);
-#endif
-
-    const TickType_t thirty_s_ticks = 30000 / portTICK_PERIOD_MS;
-    vTaskDelay(thirty_s_ticks);
-    astarte_device_stop(device);
+//     vTaskDelay( 30000 / portTICK_PERIOD_MS );
+//     astarte_device_stop(device);
 
     while (1) {
     }
@@ -196,53 +167,47 @@ void astarte_example_task(void *ctx)
  * Static functions definitions
  ***********************************************/
 
-static void astarte_connection_events_handler(astarte_device_connection_event_t *event)
-{
-    ESP_LOGI(TAG, "Astarte device connected, session_present: %d", event->session_present);
-}
+// static void astarte_connection_events_handler(astarte_device_connection_event_t *event)
+// {
+//     ESP_LOGI(TAG, "Astarte device connected, session_present: %d", event->session_present);
+// }
 
-static void astarte_data_events_handler(astarte_device_data_event_t *event)
-{
-    ESP_LOGI(TAG, "Got Astarte data event, interface_name: %s, path: %s, bson_type: %d",
-        event->interface_name, event->path, event->bson_element.type);
+// static void astarte_data_events_handler(astarte_device_data_event_t *event)
+// {
+//     ESP_LOGI(TAG, "Got Astarte data event, interface_name: %s, path: %s, bson_type: %d",
+//         event->interface_name, event->path, event->bson_element.type);
 
-#if defined(REPLY_TO_PROPERTY)
-    if (strcmp(event->interface_name, server_properties_interface1.name) == 0
-        && strcmp(event->path, "/42/boolean_endpoint") == 0
-        && event->bson_element.type == BSON_TYPE_BOOLEAN) {
+// #if defined(REPLY_TO_PROPERTY)
+//     if (strcmp(event->interface_name, server_properties_interface1.name) == 0
+//         && strcmp(event->path, "/42/boolean_endpoint") == 0
+//         && event->bson_element.type == BSON_TYPE_BOOLEAN) {
 
-        bool received_value = astarte_bson_deserializer_element_to_bool(event->bson_element);
-        ESP_LOGI(TAG, "Received: %d", received_value);
-        // Set a property to the value received
-        astarte_err_t astarte_err = astarte_device_set_boolean_property(event->device,
-            device_properties_interface1.name, "/24/boolean_endpoint", received_value);
-        ESP_LOGI(TAG, "Transmission result: %d", astarte_err);
-    }
-#endif
-#if defined(REPLY_TO_PROPERTY2)
-    if (strcmp(event->interface_name, server_properties_interface2.name) == 0
-        && strcmp(event->path, "/43/boolean_endpoint") == 0
-        && event->bson_element.type == BSON_TYPE_BOOLEAN) {
+//         bool received_value = astarte_bson_deserializer_element_to_bool(event->bson_element);
+//         ESP_LOGI(TAG, "Received: %d", received_value);
+//         // Set a property to the value received
+//         astarte_err_t astarte_err = astarte_device_set_boolean_property(event->device,
+//             device_properties_interface1.name, "/24/boolean_endpoint", received_value);
+//         ESP_LOGI(TAG, "Transmission result: %d", astarte_err);
+//     }
+// #endif
+// #if defined(REPLY_TO_PROPERTY2)
+//     if (strcmp(event->interface_name, server_properties_interface2.name) == 0
+//         && strcmp(event->path, "/43/boolean_endpoint") == 0
+//         && event->bson_element.type == BSON_TYPE_BOOLEAN) {
 
-        bool received_value = astarte_bson_deserializer_element_to_bool(event->bson_element);
-        ESP_LOGI(TAG, "Received: %d", received_value);
-        // Set a property to the value received
-        astarte_err_t astarte_err = astarte_device_set_boolean_property(event->device,
-            device_properties_interface2.name, "/25/boolean_endpoint", received_value);
-        ESP_LOGI(TAG, "Transmission result: %d", astarte_err);
-    }
-#endif
-}
+//         bool received_value = astarte_bson_deserializer_element_to_bool(event->bson_element);
+//         ESP_LOGI(TAG, "Received: %d", received_value);
+//         // Set a property to the value received
+//         astarte_err_t astarte_err = astarte_device_set_boolean_property(event->device,
+//             device_properties_interface2.name, "/25/boolean_endpoint", received_value);
+//         ESP_LOGI(TAG, "Transmission result: %d", astarte_err);
+//     }
+// #endif
+// }
 
-static void astarte_unset_events_handler(astarte_device_unset_event_t *event)
-{
-    ESP_LOGI(TAG, "Got Astarte unset event, interface_name: %s, path: %s", event->interface_name,
-        event->path);
-}
+// static void astarte_disconnection_events_handler(astarte_device_disconnection_event_t *event)
+// {
+//     (void) event;
 
-static void astarte_disconnection_events_handler(astarte_device_disconnection_event_t *event)
-{
-    (void) event;
-
-    ESP_LOGI(TAG, "Astarte device disconnected");
-}
+//     ESP_LOGI(TAG, "Astarte device disconnected");
+// }
