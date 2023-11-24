@@ -27,6 +27,7 @@
 #include "test_astarte_bson_serializer.h"
 #include "test_astarte_linked_list.h"
 #include "test_astarte_nvs_key_value.h"
+#include "test_astarte_set.h"
 #include "test_astarte_storage.h"
 
 void app_main(void)
@@ -51,6 +52,9 @@ void app_main(void)
     RUN_TEST(test_astarte_linked_list_find);
     RUN_TEST(test_astarte_linked_list_destroy);
     RUN_TEST(test_astarte_linked_list_iterator);
+
+    RUN_TEST(test_astarte_set_is_empty);
+    RUN_TEST(test_astarte_set_add_pop);
 
     RUN_TEST(test_astarte_nvs_key_value_set_get_cycle);
     RUN_TEST(test_astarte_nvs_key_value_erase_key);
