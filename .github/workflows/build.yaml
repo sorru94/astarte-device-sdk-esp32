@@ -43,6 +43,7 @@ jobs:
         - "datastreams"
         - "encryption"
         - "non_volatile_storage"
+        - "properties"
         - "registration"
         - "toggle_led"
     runs-on: ubuntu-latest
