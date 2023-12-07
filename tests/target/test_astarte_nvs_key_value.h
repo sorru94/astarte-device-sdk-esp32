@@ -26,14 +26,18 @@
 extern "C" {
 #endif
 
-void test_astarte_nvs_key_value_set_get_cycle(void);
-void test_astarte_nvs_key_value_erase_key(void);
-void test_astarte_nvs_key_value_iterator_to_empty_nvs(void);
-void test_astarte_nvs_key_value_iterator(void);
-void test_astarte_nvs_key_value_iterator_on_changing_memory_remove_first_and_only(void);
-void test_astarte_nvs_key_value_iterator_on_changing_memory_remove_first(void);
-void test_astarte_nvs_key_value_iterator_on_changing_memory_remove_last(void);
-void test_astarte_nvs_key_value_iterator_on_changing_memory_remove_middle(void);
+void test_astarte_nvs_key_value_set_get_cycle_blob(void);
+void test_astarte_nvs_key_value_set_get_cycle_i32(void);
+void test_astarte_nvs_key_value_erase_key_blob(void);
+void test_astarte_nvs_key_value_erase_key_i32(void);
+void test_astarte_nvs_key_value_iterator_to_empty_nvs_blob(void);
+void test_astarte_nvs_key_value_iterator_to_empty_nvs_i32(void);
+void test_astarte_nvs_key_value_iterator_blob(void);
+void test_astarte_nvs_key_value_iterator_i32(void);
+void test_astarte_nvs_key_value_iterator_on_changing_memory_remove_first_and_only_blob(void);
+void test_astarte_nvs_key_value_iterator_on_changing_memory_remove_first_blob(void);
+void test_astarte_nvs_key_value_iterator_on_changing_memory_remove_last_blob(void);
+void test_astarte_nvs_key_value_iterator_on_changing_memory_remove_middle_blob(void);
 
 #ifdef __cplusplus
 }

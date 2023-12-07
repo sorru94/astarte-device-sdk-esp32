@@ -52,14 +52,18 @@ void app_main(void)
     RUN_TEST(test_astarte_linked_list_iterator);
     RUN_TEST(test_astarte_linked_list_iterator_replace);
 
-    RUN_TEST(test_astarte_nvs_key_value_set_get_cycle);
-    RUN_TEST(test_astarte_nvs_key_value_erase_key);
-    RUN_TEST(test_astarte_nvs_key_value_iterator_to_empty_nvs);
-    RUN_TEST(test_astarte_nvs_key_value_iterator);
-    RUN_TEST(test_astarte_nvs_key_value_iterator_on_changing_memory_remove_first_and_only);
-    RUN_TEST(test_astarte_nvs_key_value_iterator_on_changing_memory_remove_first);
-    RUN_TEST(test_astarte_nvs_key_value_iterator_on_changing_memory_remove_last);
-    RUN_TEST(test_astarte_nvs_key_value_iterator_on_changing_memory_remove_middle);
+    RUN_TEST(test_astarte_nvs_key_value_set_get_cycle_blob);
+    RUN_TEST(test_astarte_nvs_key_value_set_get_cycle_i32);
+    RUN_TEST(test_astarte_nvs_key_value_erase_key_blob);
+    RUN_TEST(test_astarte_nvs_key_value_erase_key_i32);
+    RUN_TEST(test_astarte_nvs_key_value_iterator_to_empty_nvs_blob);
+    RUN_TEST(test_astarte_nvs_key_value_iterator_to_empty_nvs_i32);
+    RUN_TEST(test_astarte_nvs_key_value_iterator_blob);
+    RUN_TEST(test_astarte_nvs_key_value_iterator_i32);
+    RUN_TEST(test_astarte_nvs_key_value_iterator_on_changing_memory_remove_first_and_only_blob);
+    RUN_TEST(test_astarte_nvs_key_value_iterator_on_changing_memory_remove_first_blob);
+    RUN_TEST(test_astarte_nvs_key_value_iterator_on_changing_memory_remove_last_blob);
+    RUN_TEST(test_astarte_nvs_key_value_iterator_on_changing_memory_remove_middle_blob);
 
     RUN_TEST(test_astarte_storage_store_delete_cycle);
     RUN_TEST(test_astarte_storage_contains);

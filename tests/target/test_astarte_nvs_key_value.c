@@ -28,7 +28,7 @@
 
 #define TAG "NVS KEY VALUE TEST"
 
-void test_astarte_nvs_key_value_set_get_cycle(void)
+void test_astarte_nvs_key_value_set_get_cycle_blob(void)
 {
     // Prepare device by erasing default nvs partition
     TEST_ASSERT_EQUAL(ESP_OK, nvs_flash_erase());
@@ -78,7 +78,48 @@ void test_astarte_nvs_key_value_set_get_cycle(void)
     nvs_close(nvs_handle);
 }
 
-void test_astarte_nvs_key_value_erase_key(void)
+void test_astarte_nvs_key_value_set_get_cycle_i32(void)
+{
+    // Prepare device by erasing default nvs partition
+    TEST_ASSERT_EQUAL(ESP_OK, nvs_flash_erase());
+    // Prepare device by initializing default nvs partition
+    TEST_ASSERT_EQUAL(ESP_OK, nvs_flash_init());
+
+    // Write three key value pairs in nvs
+    const char nvs_namespace[] = "NVS key value";
+    const char key1[] = "super long key that would not fit normally 1";
+    const char key2[] = "super long key that would not fit normally 2";
+    const char key3[] = "super long key that would not fit normally 3";
+    int32_t value1 = 1;
+    int32_t value2 = 158;
+    int32_t value3 = 42;
+
+    nvs_handle_t nvs_handle;
+    TEST_ASSERT_EQUAL(ESP_OK, nvs_open(nvs_namespace, NVS_READWRITE, &nvs_handle));
+
+    // Set key value pairs in NVS
+    TEST_ASSERT_EQUAL(ESP_OK, astarte_nvs_key_value_set_i32(nvs_handle, key1, value1));
+    TEST_ASSERT_EQUAL(ESP_OK, astarte_nvs_key_value_set_i32(nvs_handle, key2, value2));
+    TEST_ASSERT_EQUAL(ESP_OK, astarte_nvs_key_value_set_i32(nvs_handle, key3, value3));
+
+    TEST_ASSERT_EQUAL(ESP_OK, nvs_commit(nvs_handle));
+
+    int32_t read_value1 = 0;
+    int32_t read_value2 = 0;
+    int32_t read_value3 = 0;
+
+    // Read all values from NVS
+    TEST_ASSERT_EQUAL(ESP_OK, astarte_nvs_key_value_get_i32(nvs_handle, key3, &read_value3));
+    TEST_ASSERT_EQUAL_INT32(value3, read_value3);
+    TEST_ASSERT_EQUAL(ESP_OK, astarte_nvs_key_value_get_i32(nvs_handle, key1, &read_value1));
+    TEST_ASSERT_EQUAL_INT32(value1, read_value1);
+    TEST_ASSERT_EQUAL(ESP_OK, astarte_nvs_key_value_get_i32(nvs_handle, key2, &read_value2));
+    TEST_ASSERT_EQUAL_INT32(value2, read_value2);
+
+    nvs_close(nvs_handle);
+}
+
+void test_astarte_nvs_key_value_erase_key_blob(void)
 {
     // Prepare device by erasing default nvs partition
     TEST_ASSERT_EQUAL(ESP_OK, nvs_flash_erase());
@@ -107,7 +148,7 @@ void test_astarte_nvs_key_value_erase_key(void)
     TEST_ASSERT_EQUAL(ESP_OK, nvs_commit(nvs_handle));
 
     // Remove one of the key pair values stored
-    TEST_ASSERT_EQUAL(ESP_OK, astarte_nvs_key_value_erase_key(nvs_handle, key2));
+    TEST_ASSERT_EQUAL(ESP_OK, astarte_nvs_key_value_erase_key_blob(nvs_handle, key2));
     TEST_ASSERT_EQUAL(ESP_OK, nvs_commit(nvs_handle));
 
     // Check that all other keys/values are still present
@@ -132,7 +173,7 @@ void test_astarte_nvs_key_value_erase_key(void)
     TEST_ASSERT_EQUAL_UINT8_ARRAY(value4, read_value4, length4);
 
     // Remove one more of the key pair values stored
-    TEST_ASSERT_EQUAL(ESP_OK, astarte_nvs_key_value_erase_key(nvs_handle, key4));
+    TEST_ASSERT_EQUAL(ESP_OK, astarte_nvs_key_value_erase_key_blob(nvs_handle, key4));
     TEST_ASSERT_EQUAL(ESP_OK, nvs_commit(nvs_handle));
 
     // Check that all other keys/values are still present
@@ -156,7 +197,7 @@ void test_astarte_nvs_key_value_erase_key(void)
     TEST_ASSERT_EQUAL_UINT8_ARRAY(value1, read_value1, length1);
 
     // Remove one more of the key pair values stored
-    TEST_ASSERT_EQUAL(ESP_OK, astarte_nvs_key_value_erase_key(nvs_handle, key1));
+    TEST_ASSERT_EQUAL(ESP_OK, astarte_nvs_key_value_erase_key_blob(nvs_handle, key1));
     TEST_ASSERT_EQUAL(ESP_OK, nvs_commit(nvs_handle));
 
     // Check that all other keys/values are still present
@@ -177,7 +218,7 @@ void test_astarte_nvs_key_value_erase_key(void)
     TEST_ASSERT_EQUAL_UINT8_ARRAY(value3, read_value3, length3);
 
     // Remove one more of the key pair values stored
-    TEST_ASSERT_EQUAL(ESP_OK, astarte_nvs_key_value_erase_key(nvs_handle, key3));
+    TEST_ASSERT_EQUAL(ESP_OK, astarte_nvs_key_value_erase_key_blob(nvs_handle, key3));
     TEST_ASSERT_EQUAL(ESP_OK, nvs_commit(nvs_handle));
 
     // Check that all other keys/values are still present
@@ -197,7 +238,98 @@ void test_astarte_nvs_key_value_erase_key(void)
     nvs_close(nvs_handle);
 }
 
-void test_astarte_nvs_key_value_iterator_to_empty_nvs(void)
+void test_astarte_nvs_key_value_erase_key_i32(void)
+{
+    // Prepare device by erasing default nvs partition
+    TEST_ASSERT_EQUAL(ESP_OK, nvs_flash_erase());
+    // Prepare device by initializing default nvs partition
+    TEST_ASSERT_EQUAL(ESP_OK, nvs_flash_init());
+
+    // Write three key value pairs in nvs
+    const char nvs_namespace[] = "NVS key value";
+    const char key1[] = "super long key that would not fit normally 1";
+    const char key2[] = "super long key that would not fit normally 2";
+    const char key3[] = "super long key that would not fit normally 3";
+    const char key4[] = "super long key that would not fit normally 4";
+    int32_t value1 = 1;
+    int32_t value2 = 158;
+    int32_t value3 = 42;
+    int32_t value4 = 7;
+
+    nvs_handle_t nvs_handle;
+    TEST_ASSERT_EQUAL(ESP_OK, nvs_open(nvs_namespace, NVS_READWRITE, &nvs_handle));
+
+    // Set key value pairs in NVS
+    TEST_ASSERT_EQUAL(ESP_OK, astarte_nvs_key_value_set_i32(nvs_handle, key1, value1));
+    TEST_ASSERT_EQUAL(ESP_OK, astarte_nvs_key_value_set_i32(nvs_handle, key2, value2));
+    TEST_ASSERT_EQUAL(ESP_OK, astarte_nvs_key_value_set_i32(nvs_handle, key3, value3));
+    TEST_ASSERT_EQUAL(ESP_OK, astarte_nvs_key_value_set_i32(nvs_handle, key4, value4));
+    TEST_ASSERT_EQUAL(ESP_OK, nvs_commit(nvs_handle));
+
+    // Remove one of the key pair values stored
+    TEST_ASSERT_EQUAL(ESP_OK, astarte_nvs_key_value_erase_key_i32(nvs_handle, key2));
+    TEST_ASSERT_EQUAL(ESP_OK, nvs_commit(nvs_handle));
+
+    // Check that all other keys/values are still present
+    int32_t read_value1 = 0;
+    int32_t read_value2 = 0;
+    int32_t read_value3 = 0;
+    int32_t read_value4 = 0;
+    TEST_ASSERT_EQUAL(
+        ESP_ERR_NVS_NOT_FOUND, astarte_nvs_key_value_get_i32(nvs_handle, key2, &read_value2));
+    TEST_ASSERT_EQUAL(ESP_OK, astarte_nvs_key_value_get_i32(nvs_handle, key3, &read_value3));
+    TEST_ASSERT_EQUAL_INT32(value3, read_value3);
+    TEST_ASSERT_EQUAL(ESP_OK, astarte_nvs_key_value_get_i32(nvs_handle, key1, &read_value1));
+    TEST_ASSERT_EQUAL_INT32(value1, read_value1);
+    TEST_ASSERT_EQUAL(ESP_OK, astarte_nvs_key_value_get_i32(nvs_handle, key4, &read_value4));
+    TEST_ASSERT_EQUAL_INT32(value4, read_value4);
+
+    // Remove one more of the key pair values stored
+    TEST_ASSERT_EQUAL(ESP_OK, astarte_nvs_key_value_erase_key_i32(nvs_handle, key4));
+    TEST_ASSERT_EQUAL(ESP_OK, nvs_commit(nvs_handle));
+
+    // Check that all other keys/values are still present
+    TEST_ASSERT_EQUAL(
+        ESP_ERR_NVS_NOT_FOUND, astarte_nvs_key_value_get_i32(nvs_handle, key2, &read_value2));
+    TEST_ASSERT_EQUAL(ESP_OK, astarte_nvs_key_value_get_i32(nvs_handle, key3, &read_value3));
+    TEST_ASSERT_EQUAL_INT32(value3, read_value3);
+    TEST_ASSERT_EQUAL(ESP_OK, astarte_nvs_key_value_get_i32(nvs_handle, key1, &read_value1));
+    TEST_ASSERT_EQUAL_INT32(value1, read_value1);
+    TEST_ASSERT_EQUAL(
+        ESP_ERR_NVS_NOT_FOUND, astarte_nvs_key_value_get_i32(nvs_handle, key4, &read_value4));
+
+    // Remove one more of the key pair values stored
+    TEST_ASSERT_EQUAL(ESP_OK, astarte_nvs_key_value_erase_key_i32(nvs_handle, key1));
+    TEST_ASSERT_EQUAL(ESP_OK, nvs_commit(nvs_handle));
+
+    // Check that all other keys/values are still present
+    TEST_ASSERT_EQUAL(
+        ESP_ERR_NVS_NOT_FOUND, astarte_nvs_key_value_get_i32(nvs_handle, key2, &read_value2));
+    TEST_ASSERT_EQUAL(ESP_OK, astarte_nvs_key_value_get_i32(nvs_handle, key3, &read_value3));
+    TEST_ASSERT_EQUAL_INT32(value3, read_value3);
+    TEST_ASSERT_EQUAL(
+        ESP_ERR_NVS_NOT_FOUND, astarte_nvs_key_value_get_i32(nvs_handle, key1, &read_value1));
+    TEST_ASSERT_EQUAL(
+        ESP_ERR_NVS_NOT_FOUND, astarte_nvs_key_value_get_i32(nvs_handle, key4, &read_value4));
+
+    // Remove one more of the key pair values stored
+    TEST_ASSERT_EQUAL(ESP_OK, astarte_nvs_key_value_erase_key_i32(nvs_handle, key3));
+    TEST_ASSERT_EQUAL(ESP_OK, nvs_commit(nvs_handle));
+
+    // Check that all other keys/values are still present
+    TEST_ASSERT_EQUAL(
+        ESP_ERR_NVS_NOT_FOUND, astarte_nvs_key_value_get_i32(nvs_handle, key2, &read_value2));
+    TEST_ASSERT_EQUAL(
+        ESP_ERR_NVS_NOT_FOUND, astarte_nvs_key_value_get_i32(nvs_handle, key3, &read_value3));
+    TEST_ASSERT_EQUAL(
+        ESP_ERR_NVS_NOT_FOUND, astarte_nvs_key_value_get_i32(nvs_handle, key1, &read_value1));
+    TEST_ASSERT_EQUAL(
+        ESP_ERR_NVS_NOT_FOUND, astarte_nvs_key_value_get_i32(nvs_handle, key4, &read_value4));
+
+    nvs_close(nvs_handle);
+}
+
+void test_astarte_nvs_key_value_iterator_to_empty_nvs_blob(void)
 {
     // Prepare device by erasing default nvs partition
     TEST_ASSERT_EQUAL(ESP_OK, nvs_flash_erase());
@@ -216,7 +348,26 @@ void test_astarte_nvs_key_value_iterator_to_empty_nvs(void)
     nvs_close(nvs_handle);
 }
 
-void test_astarte_nvs_key_value_iterator(void)
+void test_astarte_nvs_key_value_iterator_to_empty_nvs_i32(void)
+{
+    // Prepare device by erasing default nvs partition
+    TEST_ASSERT_EQUAL(ESP_OK, nvs_flash_erase());
+    // Prepare device by initializing default nvs partition
+    TEST_ASSERT_EQUAL(ESP_OK, nvs_flash_init());
+
+    const char nvs_namespace[] = "NVS key value";
+    nvs_handle_t nvs_handle;
+    TEST_ASSERT_EQUAL(ESP_OK, nvs_open(nvs_namespace, NVS_READWRITE, &nvs_handle));
+
+    // Initialize an iterator for the NVS
+    astarte_nvs_key_value_iterator_t nvs_key_value_iterator;
+    TEST_ASSERT_EQUAL(ESP_ERR_NVS_NOT_FOUND,
+        astarte_nvs_key_value_iterator_init(nvs_handle, NVS_TYPE_I32, &nvs_key_value_iterator));
+
+    nvs_close(nvs_handle);
+}
+
+void test_astarte_nvs_key_value_iterator_blob(void)
 {
     // Prepare device by erasing default nvs partition
     TEST_ASSERT_EQUAL(ESP_OK, nvs_flash_erase());
@@ -252,14 +403,14 @@ void test_astarte_nvs_key_value_iterator(void)
     // Check element
     size_t key_len, value_len;
     TEST_ASSERT_EQUAL(ESP_OK,
-        astarte_nvs_key_value_iterator_get_element(
+        astarte_nvs_key_value_iterator_get_element_blob(
             &nvs_key_value_iterator, NULL, &key_len, NULL, &value_len));
     TEST_ASSERT_EQUAL(45, key_len);
     TEST_ASSERT_EQUAL(2, value_len);
     char out_key1[45];
     uint8_t out_value1[2];
     TEST_ASSERT_EQUAL(ESP_OK,
-        astarte_nvs_key_value_iterator_get_element(
+        astarte_nvs_key_value_iterator_get_element_blob(
             &nvs_key_value_iterator, out_key1, &key_len, out_value1, &value_len));
     TEST_ASSERT_EQUAL_STRING(key1, out_key1);
     TEST_ASSERT_EQUAL_UINT8_ARRAY(value1, out_value1, 2);
@@ -269,14 +420,14 @@ void test_astarte_nvs_key_value_iterator(void)
 
     // Check element
     TEST_ASSERT_EQUAL(ESP_OK,
-        astarte_nvs_key_value_iterator_get_element(
+        astarte_nvs_key_value_iterator_get_element_blob(
             &nvs_key_value_iterator, NULL, &key_len, NULL, &value_len));
     TEST_ASSERT_EQUAL(45, key_len);
     TEST_ASSERT_EQUAL(1, value_len);
     char out_key3[45];
     uint8_t out_value3[1];
     TEST_ASSERT_EQUAL(ESP_OK,
-        astarte_nvs_key_value_iterator_get_element(
+        astarte_nvs_key_value_iterator_get_element_blob(
             &nvs_key_value_iterator, out_key3, &key_len, out_value3, &value_len));
     TEST_ASSERT_EQUAL_STRING(key3, out_key3);
     TEST_ASSERT_EQUAL_UINT8_ARRAY(value3, out_value3, 1);
@@ -286,14 +437,14 @@ void test_astarte_nvs_key_value_iterator(void)
 
     // Check element
     TEST_ASSERT_EQUAL(ESP_OK,
-        astarte_nvs_key_value_iterator_get_element(
+        astarte_nvs_key_value_iterator_get_element_blob(
             &nvs_key_value_iterator, NULL, &key_len, NULL, &value_len));
     TEST_ASSERT_EQUAL(45, key_len);
     TEST_ASSERT_EQUAL(5, value_len);
     char out_key2[45];
     uint8_t out_value2[5];
     TEST_ASSERT_EQUAL(ESP_OK,
-        astarte_nvs_key_value_iterator_get_element(
+        astarte_nvs_key_value_iterator_get_element_blob(
             &nvs_key_value_iterator, out_key2, &key_len, out_value2, &value_len));
     TEST_ASSERT_EQUAL_STRING(key2, out_key2);
     TEST_ASSERT_EQUAL_UINT8_ARRAY(value2, out_value2, 5);
@@ -303,14 +454,14 @@ void test_astarte_nvs_key_value_iterator(void)
 
     // Check element
     TEST_ASSERT_EQUAL(ESP_OK,
-        astarte_nvs_key_value_iterator_get_element(
+        astarte_nvs_key_value_iterator_get_element_blob(
             &nvs_key_value_iterator, NULL, &key_len, NULL, &value_len));
     TEST_ASSERT_EQUAL(45, key_len);
     TEST_ASSERT_EQUAL(4, value_len);
     char out_key4[45];
     uint8_t out_value4[4];
     TEST_ASSERT_EQUAL(ESP_OK,
-        astarte_nvs_key_value_iterator_get_element(
+        astarte_nvs_key_value_iterator_get_element_blob(
             &nvs_key_value_iterator, out_key4, &key_len, out_value4, &value_len));
     TEST_ASSERT_EQUAL_STRING(key4, out_key4);
     TEST_ASSERT_EQUAL_UINT8_ARRAY(value4, out_value4, 4);
@@ -322,10 +473,112 @@ void test_astarte_nvs_key_value_iterator(void)
     nvs_close(nvs_handle);
 }
 
+void test_astarte_nvs_key_value_iterator_i32(void)
+{
+    // Prepare device by erasing default nvs partition
+    TEST_ASSERT_EQUAL(ESP_OK, nvs_flash_erase());
+    // Prepare device by initializing default nvs partition
+    TEST_ASSERT_EQUAL(ESP_OK, nvs_flash_init());
+
+    // Write three key value pairs in nvs
+    const char nvs_namespace[] = "NVS key value";
+    const char key1[] = "super long key that would not fit normally 1";
+    const char key2[] = "super long key that would not fit normally 2";
+    const char key3[] = "super long key that would not fit normally 3";
+    const char key4[] = "super long key that would not fit normally 4";
+    int32_t value1 = 2;
+    int32_t value2 = 158;
+    int32_t value3 = 42;
+    int32_t value4 = 6;
+
+    nvs_handle_t nvs_handle;
+    TEST_ASSERT_EQUAL(ESP_OK, nvs_open(nvs_namespace, NVS_READWRITE, &nvs_handle));
+
+    // Set key value pairs in NVS
+    TEST_ASSERT_EQUAL(ESP_OK, astarte_nvs_key_value_set_i32(nvs_handle, key1, value1));
+    TEST_ASSERT_EQUAL(ESP_OK, astarte_nvs_key_value_set_i32(nvs_handle, key3, value3));
+    TEST_ASSERT_EQUAL(ESP_OK, astarte_nvs_key_value_set_i32(nvs_handle, key2, value2));
+    TEST_ASSERT_EQUAL(ESP_OK, astarte_nvs_key_value_set_i32(nvs_handle, key4, value4));
+    TEST_ASSERT_EQUAL(ESP_OK, nvs_commit(nvs_handle));
+
+    // Initialize an iterator for the NVS
+    astarte_nvs_key_value_iterator_t nvs_key_value_iterator;
+    TEST_ASSERT_EQUAL(ESP_OK,
+        astarte_nvs_key_value_iterator_init(nvs_handle, NVS_TYPE_I32, &nvs_key_value_iterator));
+
+    // Check element
+    size_t key_len;
+    TEST_ASSERT_EQUAL(ESP_OK,
+        astarte_nvs_key_value_iterator_get_element_i32(
+            &nvs_key_value_iterator, NULL, &key_len, NULL));
+    TEST_ASSERT_EQUAL(45, key_len);
+    char out_key1[45];
+    int32_t out_value1 = 0;
+    TEST_ASSERT_EQUAL(ESP_OK,
+        astarte_nvs_key_value_iterator_get_element_i32(
+            &nvs_key_value_iterator, out_key1, &key_len, &out_value1));
+    TEST_ASSERT_EQUAL_STRING(key1, out_key1);
+    TEST_ASSERT_EQUAL_INT32(value1, out_value1);
+
+    // Advance iterator
+    TEST_ASSERT_EQUAL(ESP_OK, astarte_nvs_key_value_iterator_next(&nvs_key_value_iterator));
+
+    // Check element
+    TEST_ASSERT_EQUAL(ESP_OK,
+        astarte_nvs_key_value_iterator_get_element_i32(
+            &nvs_key_value_iterator, NULL, &key_len, NULL));
+    TEST_ASSERT_EQUAL(45, key_len);
+    char out_key3[45];
+    int32_t out_value3 = 0;
+    TEST_ASSERT_EQUAL(ESP_OK,
+        astarte_nvs_key_value_iterator_get_element_i32(
+            &nvs_key_value_iterator, out_key3, &key_len, &out_value3));
+    TEST_ASSERT_EQUAL_STRING(key3, out_key3);
+    TEST_ASSERT_EQUAL_INT32(value3, out_value3);
+
+    // Advance iterator
+    TEST_ASSERT_EQUAL(ESP_OK, astarte_nvs_key_value_iterator_next(&nvs_key_value_iterator));
+
+    // Check element
+    TEST_ASSERT_EQUAL(ESP_OK,
+        astarte_nvs_key_value_iterator_get_element_i32(
+            &nvs_key_value_iterator, NULL, &key_len, NULL));
+    TEST_ASSERT_EQUAL(45, key_len);
+    char out_key2[45];
+    int32_t out_value2 = 0;
+    TEST_ASSERT_EQUAL(ESP_OK,
+        astarte_nvs_key_value_iterator_get_element_i32(
+            &nvs_key_value_iterator, out_key2, &key_len, &out_value2));
+    TEST_ASSERT_EQUAL_STRING(key2, out_key2);
+    TEST_ASSERT_EQUAL_INT32(value2, out_value2);
+
+    // Advance iterator
+    TEST_ASSERT_EQUAL(ESP_OK, astarte_nvs_key_value_iterator_next(&nvs_key_value_iterator));
+
+    // Check element
+    TEST_ASSERT_EQUAL(ESP_OK,
+        astarte_nvs_key_value_iterator_get_element_i32(
+            &nvs_key_value_iterator, NULL, &key_len, NULL));
+    TEST_ASSERT_EQUAL(45, key_len);
+    char out_key4[45];
+    int32_t out_value4 = 0;
+    TEST_ASSERT_EQUAL(ESP_OK,
+        astarte_nvs_key_value_iterator_get_element_i32(
+            &nvs_key_value_iterator, out_key4, &key_len, &out_value4));
+    TEST_ASSERT_EQUAL_STRING(key4, out_key4);
+    TEST_ASSERT_EQUAL_INT32(value4, out_value4);
+
+    // Advance iterator
+    TEST_ASSERT_EQUAL(
+        ESP_ERR_NVS_NOT_FOUND, astarte_nvs_key_value_iterator_next(&nvs_key_value_iterator));
+
+    nvs_close(nvs_handle);
+}
+
 // This will test iterating over key/value pairs and at the same time deleting some of the found
 // key/pairs.
 // This is the only supported use case of dynamically changing NVS while iterating.
-void test_astarte_nvs_key_value_iterator_on_changing_memory_remove_first_and_only(void)
+void test_astarte_nvs_key_value_iterator_on_changing_memory_remove_first_and_only_blob(void)
 {
     // Prepare device by erasing default nvs partition
     TEST_ASSERT_EQUAL(ESP_OK, nvs_flash_erase());
@@ -352,14 +605,14 @@ void test_astarte_nvs_key_value_iterator_on_changing_memory_remove_first_and_onl
     // Check first element
     size_t key_len, value_len;
     TEST_ASSERT_EQUAL(ESP_OK,
-        astarte_nvs_key_value_iterator_get_element(
+        astarte_nvs_key_value_iterator_get_element_blob(
             &nvs_key_value_iterator, NULL, &key_len, NULL, &value_len));
     TEST_ASSERT_EQUAL(45, key_len);
     TEST_ASSERT_EQUAL(2, value_len);
     char out_key1[45];
     uint8_t out_value1[2];
     TEST_ASSERT_EQUAL(ESP_OK,
-        astarte_nvs_key_value_iterator_get_element(
+        astarte_nvs_key_value_iterator_get_element_blob(
             &nvs_key_value_iterator, out_key1, &key_len, out_value1, &value_len));
     TEST_ASSERT_EQUAL_STRING(key1, out_key1);
     TEST_ASSERT_EQUAL_UINT8_ARRAY(value1, out_value1, 2);
@@ -376,7 +629,7 @@ void test_astarte_nvs_key_value_iterator_on_changing_memory_remove_first_and_onl
 // This will test iterating over key/value pairs and at the same time deleting some of the found
 // key/pairs.
 // This is the only supported use case of dynamically changing NVS while iterating.
-void test_astarte_nvs_key_value_iterator_on_changing_memory_remove_first(void)
+void test_astarte_nvs_key_value_iterator_on_changing_memory_remove_first_blob(void)
 {
     // Prepare device by erasing default nvs partition
     TEST_ASSERT_EQUAL(ESP_OK, nvs_flash_erase());
@@ -412,14 +665,14 @@ void test_astarte_nvs_key_value_iterator_on_changing_memory_remove_first(void)
     // Check first element
     size_t key_len, value_len;
     TEST_ASSERT_EQUAL(ESP_OK,
-        astarte_nvs_key_value_iterator_get_element(
+        astarte_nvs_key_value_iterator_get_element_blob(
             &nvs_key_value_iterator, NULL, &key_len, NULL, &value_len));
     TEST_ASSERT_EQUAL(45, key_len);
     TEST_ASSERT_EQUAL(2, value_len);
     char out_key1[45];
     uint8_t out_value1[2];
     TEST_ASSERT_EQUAL(ESP_OK,
-        astarte_nvs_key_value_iterator_get_element(
+        astarte_nvs_key_value_iterator_get_element_blob(
             &nvs_key_value_iterator, out_key1, &key_len, out_value1, &value_len));
     TEST_ASSERT_EQUAL_STRING(key1, out_key1);
     TEST_ASSERT_EQUAL_UINT8_ARRAY(value1, out_value1, 2);
@@ -431,19 +684,19 @@ void test_astarte_nvs_key_value_iterator_on_changing_memory_remove_first(void)
     TEST_ASSERT_TRUE(has_next);
 
     // Remove the element just fetched
-    TEST_ASSERT_EQUAL(ESP_OK, astarte_nvs_key_value_erase_key(nvs_handle, key1));
+    TEST_ASSERT_EQUAL(ESP_OK, astarte_nvs_key_value_erase_key_blob(nvs_handle, key1));
     TEST_ASSERT_EQUAL(ESP_OK, nvs_commit(nvs_handle));
 
     // Check the element the iterator is pointing to. Now it's the next element
     TEST_ASSERT_EQUAL(ESP_OK,
-        astarte_nvs_key_value_iterator_get_element(
+        astarte_nvs_key_value_iterator_get_element_blob(
             &nvs_key_value_iterator, NULL, &key_len, NULL, &value_len));
     TEST_ASSERT_EQUAL(45, key_len);
     TEST_ASSERT_EQUAL(5, value_len);
     char out_key2[45];
     uint8_t out_value2[5];
     TEST_ASSERT_EQUAL(ESP_OK,
-        astarte_nvs_key_value_iterator_get_element(
+        astarte_nvs_key_value_iterator_get_element_blob(
             &nvs_key_value_iterator, out_key2, &key_len, out_value2, &value_len));
     TEST_ASSERT_EQUAL_STRING(key2, out_key2);
     TEST_ASSERT_EQUAL_UINT8_ARRAY(value2, out_value2, 2);
@@ -453,14 +706,14 @@ void test_astarte_nvs_key_value_iterator_on_changing_memory_remove_first(void)
 
     // Check element
     TEST_ASSERT_EQUAL(ESP_OK,
-        astarte_nvs_key_value_iterator_get_element(
+        astarte_nvs_key_value_iterator_get_element_blob(
             &nvs_key_value_iterator, NULL, &key_len, NULL, &value_len));
     TEST_ASSERT_EQUAL(45, key_len);
     TEST_ASSERT_EQUAL(1, value_len);
     char out_key3[45];
     uint8_t out_value3[1];
     TEST_ASSERT_EQUAL(ESP_OK,
-        astarte_nvs_key_value_iterator_get_element(
+        astarte_nvs_key_value_iterator_get_element_blob(
             &nvs_key_value_iterator, out_key3, &key_len, out_value3, &value_len));
     TEST_ASSERT_EQUAL_STRING(key3, out_key3);
     TEST_ASSERT_EQUAL_UINT8_ARRAY(value3, out_value3, 1);
@@ -470,14 +723,14 @@ void test_astarte_nvs_key_value_iterator_on_changing_memory_remove_first(void)
 
     // Check element
     TEST_ASSERT_EQUAL(ESP_OK,
-        astarte_nvs_key_value_iterator_get_element(
+        astarte_nvs_key_value_iterator_get_element_blob(
             &nvs_key_value_iterator, NULL, &key_len, NULL, &value_len));
     TEST_ASSERT_EQUAL(45, key_len);
     TEST_ASSERT_EQUAL(4, value_len);
     char out_key4[45];
     uint8_t out_value4[4];
     TEST_ASSERT_EQUAL(ESP_OK,
-        astarte_nvs_key_value_iterator_get_element(
+        astarte_nvs_key_value_iterator_get_element_blob(
             &nvs_key_value_iterator, out_key4, &key_len, out_value4, &value_len));
     TEST_ASSERT_EQUAL_STRING(key4, out_key4);
     TEST_ASSERT_EQUAL_UINT8_ARRAY(value4, out_value4, 4);
@@ -492,7 +745,7 @@ void test_astarte_nvs_key_value_iterator_on_changing_memory_remove_first(void)
 // This will test iterating over key/value pairs and at the same time deleting some of the found
 // key/pairs.
 // This is the only supported use case of dynamically changing NVS while iterating.
-void test_astarte_nvs_key_value_iterator_on_changing_memory_remove_last(void)
+void test_astarte_nvs_key_value_iterator_on_changing_memory_remove_last_blob(void)
 {
     // Prepare device by erasing default nvs partition
     TEST_ASSERT_EQUAL(ESP_OK, nvs_flash_erase());
@@ -528,14 +781,14 @@ void test_astarte_nvs_key_value_iterator_on_changing_memory_remove_last(void)
     // Check first element
     size_t key_len, value_len;
     TEST_ASSERT_EQUAL(ESP_OK,
-        astarte_nvs_key_value_iterator_get_element(
+        astarte_nvs_key_value_iterator_get_element_blob(
             &nvs_key_value_iterator, NULL, &key_len, NULL, &value_len));
     TEST_ASSERT_EQUAL(45, key_len);
     TEST_ASSERT_EQUAL(2, value_len);
     char out_key1[45];
     uint8_t out_value1[2];
     TEST_ASSERT_EQUAL(ESP_OK,
-        astarte_nvs_key_value_iterator_get_element(
+        astarte_nvs_key_value_iterator_get_element_blob(
             &nvs_key_value_iterator, out_key1, &key_len, out_value1, &value_len));
     TEST_ASSERT_EQUAL_STRING(key1, out_key1);
     TEST_ASSERT_EQUAL_UINT8_ARRAY(value1, out_value1, 2);
@@ -545,14 +798,14 @@ void test_astarte_nvs_key_value_iterator_on_changing_memory_remove_last(void)
 
     // Check the element the iterator is pointing to. Now it's the next element
     TEST_ASSERT_EQUAL(ESP_OK,
-        astarte_nvs_key_value_iterator_get_element(
+        astarte_nvs_key_value_iterator_get_element_blob(
             &nvs_key_value_iterator, NULL, &key_len, NULL, &value_len));
     TEST_ASSERT_EQUAL(45, key_len);
     TEST_ASSERT_EQUAL(5, value_len);
     char out_key2[45];
     uint8_t out_value2[5];
     TEST_ASSERT_EQUAL(ESP_OK,
-        astarte_nvs_key_value_iterator_get_element(
+        astarte_nvs_key_value_iterator_get_element_blob(
             &nvs_key_value_iterator, out_key2, &key_len, out_value2, &value_len));
     TEST_ASSERT_EQUAL_STRING(key2, out_key2);
     TEST_ASSERT_EQUAL_UINT8_ARRAY(value2, out_value2, 2);
@@ -562,14 +815,14 @@ void test_astarte_nvs_key_value_iterator_on_changing_memory_remove_last(void)
 
     // Check element
     TEST_ASSERT_EQUAL(ESP_OK,
-        astarte_nvs_key_value_iterator_get_element(
+        astarte_nvs_key_value_iterator_get_element_blob(
             &nvs_key_value_iterator, NULL, &key_len, NULL, &value_len));
     TEST_ASSERT_EQUAL(45, key_len);
     TEST_ASSERT_EQUAL(1, value_len);
     char out_key3[45];
     uint8_t out_value3[1];
     TEST_ASSERT_EQUAL(ESP_OK,
-        astarte_nvs_key_value_iterator_get_element(
+        astarte_nvs_key_value_iterator_get_element_blob(
             &nvs_key_value_iterator, out_key3, &key_len, out_value3, &value_len));
     TEST_ASSERT_EQUAL_STRING(key3, out_key3);
     TEST_ASSERT_EQUAL_UINT8_ARRAY(value3, out_value3, 1);
@@ -579,14 +832,14 @@ void test_astarte_nvs_key_value_iterator_on_changing_memory_remove_last(void)
 
     // Check element
     TEST_ASSERT_EQUAL(ESP_OK,
-        astarte_nvs_key_value_iterator_get_element(
+        astarte_nvs_key_value_iterator_get_element_blob(
             &nvs_key_value_iterator, NULL, &key_len, NULL, &value_len));
     TEST_ASSERT_EQUAL(45, key_len);
     TEST_ASSERT_EQUAL(4, value_len);
     char out_key4[45];
     uint8_t out_value4[4];
     TEST_ASSERT_EQUAL(ESP_OK,
-        astarte_nvs_key_value_iterator_get_element(
+        astarte_nvs_key_value_iterator_get_element_blob(
             &nvs_key_value_iterator, out_key4, &key_len, out_value4, &value_len));
     TEST_ASSERT_EQUAL_STRING(key4, out_key4);
     TEST_ASSERT_EQUAL_UINT8_ARRAY(value4, out_value4, 4);
@@ -602,7 +855,7 @@ void test_astarte_nvs_key_value_iterator_on_changing_memory_remove_last(void)
     TEST_ASSERT_FALSE(has_next);
 
     // Remove the element just fetched
-    TEST_ASSERT_EQUAL(ESP_OK, astarte_nvs_key_value_erase_key(nvs_handle, key4));
+    TEST_ASSERT_EQUAL(ESP_OK, astarte_nvs_key_value_erase_key_blob(nvs_handle, key4));
     TEST_ASSERT_EQUAL(ESP_OK, nvs_commit(nvs_handle));
 
     nvs_close(nvs_handle);
@@ -611,7 +864,7 @@ void test_astarte_nvs_key_value_iterator_on_changing_memory_remove_last(void)
 // This will test iterating over key/value pairs and at the same time deleting some of the found
 // key/pairs.
 // This is the only supported use case of dynamically changing NVS while iterating.
-void test_astarte_nvs_key_value_iterator_on_changing_memory_remove_middle(void)
+void test_astarte_nvs_key_value_iterator_on_changing_memory_remove_middle_blob(void)
 {
     // Prepare device by erasing default nvs partition
     TEST_ASSERT_EQUAL(ESP_OK, nvs_flash_erase());
@@ -647,14 +900,14 @@ void test_astarte_nvs_key_value_iterator_on_changing_memory_remove_middle(void)
     // Check first element
     size_t key_len, value_len;
     TEST_ASSERT_EQUAL(ESP_OK,
-        astarte_nvs_key_value_iterator_get_element(
+        astarte_nvs_key_value_iterator_get_element_blob(
             &nvs_key_value_iterator, NULL, &key_len, NULL, &value_len));
     TEST_ASSERT_EQUAL(45, key_len);
     TEST_ASSERT_EQUAL(2, value_len);
     char out_key1[45];
     uint8_t out_value1[2];
     TEST_ASSERT_EQUAL(ESP_OK,
-        astarte_nvs_key_value_iterator_get_element(
+        astarte_nvs_key_value_iterator_get_element_blob(
             &nvs_key_value_iterator, out_key1, &key_len, out_value1, &value_len));
     TEST_ASSERT_EQUAL_STRING(key1, out_key1);
     TEST_ASSERT_EQUAL_UINT8_ARRAY(value1, out_value1, 2);
@@ -664,14 +917,14 @@ void test_astarte_nvs_key_value_iterator_on_changing_memory_remove_middle(void)
 
     // Check the element the iterator is pointing to. Now it's the next element
     TEST_ASSERT_EQUAL(ESP_OK,
-        astarte_nvs_key_value_iterator_get_element(
+        astarte_nvs_key_value_iterator_get_element_blob(
             &nvs_key_value_iterator, NULL, &key_len, NULL, &value_len));
     TEST_ASSERT_EQUAL(45, key_len);
     TEST_ASSERT_EQUAL(5, value_len);
     char out_key2[45];
     uint8_t out_value2[5];
     TEST_ASSERT_EQUAL(ESP_OK,
-        astarte_nvs_key_value_iterator_get_element(
+        astarte_nvs_key_value_iterator_get_element_blob(
             &nvs_key_value_iterator, out_key2, &key_len, out_value2, &value_len));
     TEST_ASSERT_EQUAL_STRING(key2, out_key2);
     TEST_ASSERT_EQUAL_UINT8_ARRAY(value2, out_value2, 2);
@@ -683,19 +936,19 @@ void test_astarte_nvs_key_value_iterator_on_changing_memory_remove_middle(void)
     TEST_ASSERT_TRUE(has_next);
 
     // Remove the element just fetched
-    TEST_ASSERT_EQUAL(ESP_OK, astarte_nvs_key_value_erase_key(nvs_handle, key2));
+    TEST_ASSERT_EQUAL(ESP_OK, astarte_nvs_key_value_erase_key_blob(nvs_handle, key2));
     TEST_ASSERT_EQUAL(ESP_OK, nvs_commit(nvs_handle));
 
     // Check element
     TEST_ASSERT_EQUAL(ESP_OK,
-        astarte_nvs_key_value_iterator_get_element(
+        astarte_nvs_key_value_iterator_get_element_blob(
             &nvs_key_value_iterator, NULL, &key_len, NULL, &value_len));
     TEST_ASSERT_EQUAL(45, key_len);
     TEST_ASSERT_EQUAL(1, value_len);
     char out_key3[45];
     uint8_t out_value3[1];
     TEST_ASSERT_EQUAL(ESP_OK,
-        astarte_nvs_key_value_iterator_get_element(
+        astarte_nvs_key_value_iterator_get_element_blob(
             &nvs_key_value_iterator, out_key3, &key_len, out_value3, &value_len));
     TEST_ASSERT_EQUAL_STRING(key3, out_key3);
     TEST_ASSERT_EQUAL_UINT8_ARRAY(value3, out_value3, 1);
@@ -705,14 +958,14 @@ void test_astarte_nvs_key_value_iterator_on_changing_memory_remove_middle(void)
 
     // Check element
     TEST_ASSERT_EQUAL(ESP_OK,
-        astarte_nvs_key_value_iterator_get_element(
+        astarte_nvs_key_value_iterator_get_element_blob(
             &nvs_key_value_iterator, NULL, &key_len, NULL, &value_len));
     TEST_ASSERT_EQUAL(45, key_len);
     TEST_ASSERT_EQUAL(4, value_len);
     char out_key4[45];
     uint8_t out_value4[4];
     TEST_ASSERT_EQUAL(ESP_OK,
-        astarte_nvs_key_value_iterator_get_element(
+        astarte_nvs_key_value_iterator_get_element_blob(
             &nvs_key_value_iterator, out_key4, &key_len, out_value4, &value_len));
     TEST_ASSERT_EQUAL_STRING(key4, out_key4);
     TEST_ASSERT_EQUAL_UINT8_ARRAY(value4, out_value4, 4);
