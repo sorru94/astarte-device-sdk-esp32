@@ -6,43 +6,40 @@
 
 /**
  * @file astarte_interface.h
- * @brief Astarte interface functions.
+ * @brief Generic specifications for Astarte interface.
  */
 
 #ifndef _ASTARTE_INTERFACE_H_
 #define _ASTARTE_INTERFACE_H_
 
-/**
- * @brief interface ownership
- *
- * This enum represents the possible ownerhips of an Astarte interface
- */
+#include "astarte_mapping.h"
+
 typedef enum
 {
-    OWNERSHIP_DEVICE = 1, /**< Device owned interface */
-    OWNERSHIP_SERVER, /**< Server owned interface*/
+    OWNERSHIP_DEVICE = 1,
+    OWNERSHIP_SERVER,
 } astarte_interface_ownership_t;
 
 typedef enum
 {
-    TYPE_DATASTREAM = 1, /**< Datastream interface */
-    TYPE_PROPERTIES, /**< Properties interface */
+    TYPE_DATASTREAM = 1,
+    TYPE_PROPERTIES,
 } astarte_interface_type_t;
 
-/**
- * @brief Astarte interface definition
- *
- * This struct represents a subset of the information contained in an Astarte interface, and can be
- * used to specify some details about a specific interface.
- *
- */
-typedef struct
+typedef enum
 {
-    const char *name; /**< Interface name */
-    int major_version; /**< Major version */
-    int minor_version; /**< Minor version */
-    astarte_interface_ownership_t ownership; /**< Ownership, see #astarte_interface_ownership_t */
-    astarte_interface_type_t type; /**< Type, see #astarte_interface_type_t */
+    AGGREGATION_INDIVIDUAL = 1,
+    AGGREGATION_OBJECT,
+} astarte_interface_aggregation_t;
+
+typedef struct {
+    const char *name;
+    int major_version;
+    int minor_version;
+    astarte_interface_type_t type;
+    astarte_interface_ownership_t ownership;
+    astarte_interface_aggregation_t aggregation;
+    const astarte_mapping_t *mappings;
 } astarte_interface_t;
 
-#endif
+#endif /* _ASTARTE_INTERFACE_H_ */

@@ -33,6 +33,7 @@
 #include "astarte_credentials.h"
 #include "astarte_device.h"
 #include "astarte_interface.h"
+#include "astarte_interface_gen.h"
 
 /************************************************
  * Constants and defines
@@ -43,22 +44,6 @@
 static const char cred_sec[] = CONFIG_CREDENTIALS_SECRET;
 static const char hwid[] = CONFIG_DEVICE_ID;
 static const char realm[] = CONFIG_ASTARTE_REALM;
-
-const static astarte_interface_t device_datastream_interface = {
-    .name = "org.astarteplatform.esp32.examples.DeviceAggregate",
-    .major_version = 0,
-    .minor_version = 1,
-    .ownership = OWNERSHIP_DEVICE,
-    .type = TYPE_DATASTREAM,
-};
-
-const static astarte_interface_t server_datastream_interface = {
-    .name = "org.astarteplatform.esp32.examples.ServerAggregate",
-    .major_version = 0,
-    .minor_version = 1,
-    .ownership = OWNERSHIP_SERVER,
-    .type = TYPE_DATASTREAM,
-};
 
 /************************************************
  * Structs declarations
@@ -134,8 +119,10 @@ void astarte_example_task(void *ctx)
         return;
     }
 
-    astarte_device_add_interface(device, &device_datastream_interface);
-    astarte_device_add_interface(device, &server_datastream_interface);
+    astarte_device_add_interface(
+        device, &astarte_interface_org_astarteplatform_esp32_examples_DeviceAggregate);
+    astarte_device_add_interface(
+        device, &astarte_interface_org_astarteplatform_esp32_examples_ServerAggregate);
     if (astarte_device_start(device) != ASTARTE_OK) {
         ESP_LOGE(TAG, "Failed to start astarte device");
         return;
@@ -163,7 +150,9 @@ static void astarte_data_events_handler(astarte_device_data_event_t *event)
     uint8_t parsing_error = 0;
     struct rx_aggregate rx_data;
 
-    if ((strcmp(event->interface_name, server_datastream_interface.name) == 0)
+    if ((strcmp(event->interface_name,
+             astarte_interface_org_astarteplatform_esp32_examples_ServerAggregate.name)
+            == 0)
         && (strcmp(event->path, "/11") == 0)) {
 
         parsing_error = parse_received_bson(event->bson_element, &rx_data);
@@ -199,8 +188,9 @@ static void astarte_data_events_handler(astarte_device_data_event_t *event)
         astarte_bson_serializer_append_end_of_document(aggregate_bson);
 
         const void *doc = astarte_bson_serializer_get_document(aggregate_bson, NULL);
-        astarte_err_t res = astarte_device_stream_aggregate(
-            event->device, device_datastream_interface.name, "/24", doc, 0);
+        astarte_err_t res = astarte_device_stream_aggregate(event->device,
+            astarte_interface_org_astarteplatform_esp32_examples_DeviceAggregate.name, "/24", doc,
+            0);
         if (res != ASTARTE_OK) {
             ESP_LOGE(TAG, "Error streaming the aggregate");
         }

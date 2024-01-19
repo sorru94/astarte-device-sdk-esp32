@@ -28,6 +28,7 @@
 #include "test_astarte_linked_list.h"
 #include "test_astarte_nvs_key_value.h"
 #include "test_astarte_storage.h"
+#include "test_astarte_mapping.h"
 
 void app_main(void)
 {
@@ -66,5 +67,7 @@ void app_main(void)
     RUN_TEST(test_astarte_storage_clear);
     RUN_TEST(test_astarte_storage_iteration);
     RUN_TEST(test_astarte_storage_iteration_empty_memory);
+
+    RUN_TEST(test_astarte_mapping_validate_path);
     UNITY_END();
 }
